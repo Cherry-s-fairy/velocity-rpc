@@ -10,7 +10,7 @@ import com.cherry.velocityrpc.server.VertxHttpServer;
  */
 public class SimpleProviderExample {
     public static void main(String[] args) {
-        // 注册服务
+        // 在本地注册器中注册服务
         LocalRegistry.register(UserService.class.getName(), UserServiceImpl.class);
         // 启动web服务
         HttpServer httpServer = new VertxHttpServer();

@@ -1,9 +1,12 @@
 package com.cherry.velocityrpc.model;
 
+import com.cherry.velocityrpc.serializer.Serializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 /**
  * 请求处理器：处理接收到的请求，根据请求参数找到对应的服务和方法，通过反射实现调用，最后封装结果并响应请求
@@ -15,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RpcResponse {
+public class RpcResponse implements Serializable {
     private Object data; // 响应数据
     private Class<?> dataType; // 响应数据类型
     private String message; // 响应信息

@@ -3,17 +3,23 @@ package com.cherry.example.consumer;
 
 import com.cherry.example.common.model.User;
 import com.cherry.example.common.service.UserService;
+import com.cherry.velocityrpc.proxy.ServiceProxyFactory;
 
 /**
  * 简易服务消费者示例
+ *
+ * 设置静态代理UserServiceProxy简化消费方调用（不灵活，摒弃
+ * 设置动态代理
  */
 public class SimpleComsumerExample {
     public static void main(String[] args) {
-        // todo 需要获取UserService的实现类对象
-        // 之后目标：通过RPC框架快速得到一个支持远程调用服务提供者的代理对象，像调用本地方法一样调用UserService的方法
-        UserService userService = null;
+//        // 静态代理
+//        UserService userService = new UserServiceProxy();
+        // 动态代理
+        UserService userService = ServiceProxyFactory.getProxy(UserService.class);
+
         User user = new User();
-        user.setName("Cherry");
+        user.setName("cherry");
         // 调用
         User newUser = userService.getUser(user);
         if(newUser != null) {
