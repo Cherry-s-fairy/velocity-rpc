@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="example_common" />
         <module name="simple_velocity_rpc" />
+        <module name="velocity-rpc-core" />
         <module name="velocity-rpc" />
         <module name="example_provider" />
         <module name="example_consumer" />

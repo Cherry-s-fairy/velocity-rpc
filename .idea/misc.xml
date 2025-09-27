@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/example_provider/pom.xml" />
         <option value="$PROJECT_DIR$/simple_velocity_rpc/pom.xml" />
         <option value="$PROJECT_DIR$/example_common/pom.xml" />
+        <option value="$PROJECT_DIR$/velocity-rpc-core/pom.xml" />
       </list>
     </option>
   </component>
