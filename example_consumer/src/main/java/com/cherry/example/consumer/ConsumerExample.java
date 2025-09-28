@@ -4,7 +4,7 @@ import com.cherry.velocityrpc.config.RpcConfig;
 import com.cherry.velocityrpc.utils.ConfigUtils;
 
 /**
- * 服务消费者示例
+ * 测试配置文件读取（application.properties）
  */
 public class ConsumerExample {
     public static void main(String[] args) {
