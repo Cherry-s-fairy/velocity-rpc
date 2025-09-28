@@ -7,6 +7,8 @@ import lombok.Data;
  */
 @Data
 public class RpcConfig {
+    private boolean mock = false; // 模拟调用
+
     private String name = "velocity-rpc"; // 名称
     private String version = "1.0"; // 版本号
     private String serverHost = "http://localhost"; // 服务器主机名

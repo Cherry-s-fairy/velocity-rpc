@@ -18,25 +18,11 @@ import java.lang.reflect.Method;
  *   1. JDK动态代理：只对接口进行代理，但性能好；
  *   2. 基于字节码生成的动态代理，如CGLB：可以代理任何类型，性能略低于JDK动态代理。
  *
- * 当用户调用某个接口的方法时，讳改为调用invoke方法。再invoke方法中获取要调用的方法信息、参数列表等，以此构造Rpc请求对象。
+ * 当用户调用某个接口的方法时，会改为调用invoke方法。再invoke方法中获取要调用的方法信息、参数列表等，以此构造Rpc请求对象。
  */
 public class ServiceProxy implements InvocationHandler {
     /**
      * 调用代理
-     * @param proxy the proxy instance that the method was invoked on
-     *
-     * @param method the {@code Method} instance corresponding to
-     * the interface method invoked on the proxy instance.  The declaring
-     * class of the {@code Method} object will be the interface that
-     * the method was declared in, which may be a superinterface of the
-     * proxy interface that the proxy class inherits the method through.
-     *
-     * @param args an array of objects containing the values of the
-     * arguments passed in the method invocation on the proxy instance,
-     * or {@code null} if interface method takes no arguments.
-     * Arguments of primitive types are wrapped in instances of the
-     * appropriate primitive wrapper class, such as
-     * {@code java.lang.Integer} or {@code java.lang.Boolean}.
      *
      * @return
      * @throws Throwable

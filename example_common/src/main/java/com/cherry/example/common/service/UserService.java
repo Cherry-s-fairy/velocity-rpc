@@ -12,4 +12,12 @@ public interface UserService {
      * @return
      */
     User getUser(User user);
+
+    /**
+     * 默认方法，测试Mock动态代理
+     * @return
+     */
+    default short getNumber() {
+        return (short) 1;
+    }
 }
