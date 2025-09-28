@@ -1,0 +1,4 @@
+jdk=com.cherry.velocityrpc.serializer.JdkSerializer
+json=com.cherry.velocityrpc.serializer.JsonSerializer
+kryo=com.cherry.velocityrpc.serializer.KryoSerializer
+hessian=com.cherry.velocityrpc.serializer.HessianSerializer
