@@ -1,8 +1,12 @@
 package com.cherry.velocityrpc.model;
 
+import cn.hutool.core.util.StrUtil;
+import lombok.Data;
+
 /**
  * 服务元信息（注册信息定义
  */
+@Data
 public class ServiceMetaInfo {
     private String serviceName; // 服务名称
     private String serviceVersion = "1.0"; // 服务版本号
@@ -26,5 +30,16 @@ public class ServiceMetaInfo {
      */
     public String getServiceNodeKey() {
         return String.format("%s/%s:%s", getServiceKey(), serviceHost,servicePort);
+    }
+
+    /**
+     * 获取完整服务地址
+     * @return
+     */
+    public String getServiceAddress() {
+        if(!StrUtil.contains(serviceHost, "http")) {
+            return String.format("http://%s:%s", serviceHost, servicePort);
+        }
+        return String.format("%s:%s", serviceHost, servicePort);
     }
 }
