@@ -1,5 +1,6 @@
 package com.cherry.velocityrpc.model;
 
+import com.cherry.velocityrpc.constant.RpcConstant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,4 +25,6 @@ public class RpcRequest implements Serializable {
     private String methodName; // 方法名称
     private Class<?>[] parameterTypes; // 参数类型列表
     private Object[] args; // 参数列表
+
+    private String serviceVersion = RpcConstant.DEFAULT_SERVICE_VERSION; // 服务版本（注册中心
 }

@@ -16,4 +16,6 @@ public class RpcConfig {
     private Integer serverPort = 8080; // 服务器端口号
 
     private String serializer = SerializerKeys.JDK; // 序列化器
+
+    private RegistryConfig registryConfig = new RegistryConfig(); // 注册中心配置
 }
