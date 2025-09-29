@@ -1,5 +1,8 @@
 package com.cherry.velocityrpc;
 
+import com.cherry.velocityrpc.config.RegistryConfig;
+import com.cherry.velocityrpc.registry.Registry;
+import com.cherry.velocityrpc.registry.RegistryFactory;
 import lombok.extern.slf4j.Slf4j;
 import com.cherry.velocityrpc.config.RpcConfig;
 import com.cherry.velocityrpc.constant.RpcConstant;
@@ -40,6 +43,12 @@ public class RpcApplication {
     public static void init(RpcConfig newRpcConfig) {
         rpcConfig = newRpcConfig;
         log.info("rpc init, config = {}", newRpcConfig.toString());
+
+        // 注册中心初始化
+        RegistryConfig registryConfig = rpcConfig.getRegistryConfig();
+        Registry registry = RegistryFactory.getInstance(registryConfig.getRegistry());
+        registry.init(registryConfig);
+        log.info("registry init, config = {}", registryConfig);
     }
 
     /**

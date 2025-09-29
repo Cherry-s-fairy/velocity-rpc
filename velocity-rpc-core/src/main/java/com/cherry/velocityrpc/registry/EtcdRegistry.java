@@ -4,15 +4,15 @@ import cn.hutool.json.JSONUtil;
 import com.cherry.velocityrpc.config.RegistryConfig;
 import com.cherry.velocityrpc.model.ServiceMetaInfo;
 import io.etcd.jetcd.*;
-import io.etcd.jetcd.kv.GetResponse;
+//import io.etcd.jetcd.kv.GetResponse;
 import io.etcd.jetcd.options.GetOption;
 import io.etcd.jetcd.options.PutOption;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+//import java.util.concurrent.CompletableFuture;
+//import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
