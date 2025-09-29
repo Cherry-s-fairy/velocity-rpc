@@ -39,9 +39,9 @@ public class SpiLoader {
     // 对象实例缓存，避免重复new：类路径 => 对象实例，单例模式
     private static final Map<String, Object> instanceCache = new ConcurrentHashMap<>();
     // 系统SPI目录
-    private static final String RPC_SYSTEM_SPI_DIR = "META-INF/rpc/system";
+    private static final String RPC_SYSTEM_SPI_DIR = "META-INF/rpc/system/";
     // 用户自定义spi目录
-    private static final String RPC_CUSTOM_SPI_DIR = "META-INF/rpc/custom";
+    private static final String RPC_CUSTOM_SPI_DIR = "META-INF/rpc/custom/";
     // 扫描路径
     private static final String[] SCAN_DIRS = new String[]{RPC_SYSTEM_SPI_DIR, RPC_CUSTOM_SPI_DIR};
     // 动态加载的类列表
@@ -52,8 +52,8 @@ public class SpiLoader {
      */
     public static void loadAll() {
         log.info("加载所有SPI...");
-        for(Class<?> aclass : Load_CLASS_LIST) {
-            load(aclass);
+        for(Class<?> aClass : Load_CLASS_LIST) {
+            load(aClass);
         }
     }
 
@@ -68,6 +68,8 @@ public class SpiLoader {
         // 扫描路径，用户自定义的spi优先级高于系统spi
         Map<String, Class<?>> keyClassMap = new HashMap<>();
         for(String scanDir : SCAN_DIRS) {
+            String resourcePath = scanDir + loadClass.getName();
+            log.info("扫描路径: {}", resourcePath);
             List<URL> resources = ResourceUtil.getResources(scanDir + loadClass.getName()); // 不通过文件路径获得
             // 读取每个资源文件
             for(URL resource : resources) {
@@ -115,5 +117,12 @@ public class SpiLoader {
             }
         }
         return (T) instanceCache.get(implClassName);
+    }
+
+    public static void main(String[] args) {
+        loadAll();
+        System.out.println(loaderMap);
+        Serializer serializer = getInstance(Serializer.class,"a");
+        System.out.println(serializer);
     }
 }
