@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProtocolMessage<T> {
     // 协议消息头
-    private static class Header {
+    @Data
+    public static class Header {
         private byte magic; // 魔数，保证安全性
         private byte version; // 版本号
         private byte serializer; // 序列化器
