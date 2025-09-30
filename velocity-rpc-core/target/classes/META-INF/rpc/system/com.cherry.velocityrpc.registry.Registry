@@ -1,1 +1,2 @@
 etcd=com.cherry.velocityrpc.registry.EtcdRegistry
+zookeeper=com.cherry.velocityrpc.registry.ZooKeeperRegistry
