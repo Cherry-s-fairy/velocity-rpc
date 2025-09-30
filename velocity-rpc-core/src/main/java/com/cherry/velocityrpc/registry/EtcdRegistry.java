@@ -1,5 +1,8 @@
 package com.cherry.velocityrpc.registry;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.cron.CronUtil;
+import cn.hutool.cron.task.Task;
 import cn.hutool.json.JSONUtil;
 import com.cherry.velocityrpc.config.RegistryConfig;
 import com.cherry.velocityrpc.model.ServiceMetaInfo;
@@ -10,9 +13,11 @@ import io.etcd.jetcd.options.PutOption;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.List;
 //import java.util.concurrent.CompletableFuture;
 //import java.util.concurrent.ExecutionException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -66,6 +71,8 @@ public class EtcdRegistry implements Registry{
 
     private Client client;
     private KV kvClient;
+    // 本机注册的节点的key集合，用于心跳检测维护续期
+    private final Set<String> localRegisterNodeKeySet = new HashSet<>();
     private static final String ETCD_ROOT_PATH = "/rpc/"; // 根节点
 
     /**
@@ -79,6 +86,9 @@ public class EtcdRegistry implements Registry{
                 .connectTimeout(Duration.ofMillis(registryConfig.getTimeout()))
                 .build();
         kvClient = client.getKVClient();
+
+        // 开启心跳检测
+        heartBeat();
     }
 
     /**
@@ -99,6 +109,9 @@ public class EtcdRegistry implements Registry{
         // 将键值对与租约关联
         PutOption putOption = PutOption.builder().withLeaseId(leaseId).build();
         kvClient.put(key, value, putOption).get();
+
+        // 添加节点信息到本地缓存
+        localRegisterNodeKeySet.add(registerKey);
     }
 
     /**
@@ -109,6 +122,9 @@ public class EtcdRegistry implements Registry{
     public void unRegister(ServiceMetaInfo serviceMetaInfo) {
         String registerKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
         kvClient.delete(ByteSequence.from(registerKey, StandardCharsets.UTF_8));
+
+        // 从本地缓存中删除节点
+        localRegisterNodeKeySet.remove(registerKey);
     }
 
     /**
@@ -139,6 +155,42 @@ public class EtcdRegistry implements Registry{
         } catch (Exception e) {
             throw new RuntimeException("获取服务列表失败", e);
         }
+    }
+
+    /**
+     * 心跳检测，服务续签
+     */
+    @Override
+    public void heartBeat() {
+        // 设置的TTL是30s，所以10s续签一次，有1次容错机会
+        CronUtil.schedule("*/10 * * * * *", new Task() {
+            @Override
+            public void execute() {
+                // 遍历本节点所有的key
+                for(String key : localRegisterNodeKeySet) {
+                    try {
+                        List<KeyValue> keyValues = kvClient.get(ByteSequence.from(key, StandardCharsets.UTF_8))
+                                .get()
+                                .getKvs();
+                        // 如果该节点已经过期，需要重启才能注册
+                        if(CollUtil.isEmpty(keyValues)) {
+                            continue;
+                        }
+                        // 节点未过期，重新注册
+                        KeyValue keyValue = keyValues.get(0);
+                        String value = keyValue.getValue().toString(StandardCharsets.UTF_8);
+                        ServiceMetaInfo serviceMetaInfo = JSONUtil.toBean(value, ServiceMetaInfo.class);
+                        register(serviceMetaInfo);
+                    } catch (Exception e) {
+                        throw new RuntimeException(key + "续签失败", e);
+                    }
+                }
+            }
+        });
+
+        // 支持秒级别定时任务
+        CronUtil.setMatchSecond(true);
+        CronUtil.start();
     }
 
     /**
