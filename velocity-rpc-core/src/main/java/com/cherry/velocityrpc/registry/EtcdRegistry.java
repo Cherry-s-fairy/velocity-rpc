@@ -1,6 +1,7 @@
 package com.cherry.velocityrpc.registry;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.cron.CronUtil;
 import cn.hutool.cron.task.Task;
 import cn.hutool.json.JSONUtil;
@@ -10,6 +11,8 @@ import io.etcd.jetcd.*;
 //import io.etcd.jetcd.kv.GetResponse;
 import io.etcd.jetcd.options.GetOption;
 import io.etcd.jetcd.options.PutOption;
+import io.etcd.jetcd.watch.WatchEvent;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -54,6 +57,7 @@ import java.util.stream.Collectors;
  *     每个键都有一个与之关联的版本号，用于跟踪键的修改历史。当一个键的值发生变化时，其版本号也会增加。
  *     通过使用etcd的Watch API,可以监视键的变化，并在发生变化时接收通知。
  */
+@Slf4j
 public class EtcdRegistry implements Registry{
     // etcd测试
 //    public static void main(String[] args) throws ExecutionException, InterruptedException {
@@ -73,7 +77,12 @@ public class EtcdRegistry implements Registry{
     private KV kvClient;
     // 本机注册的节点的key集合，用于心跳检测维护续期
     private final Set<String> localRegisterNodeKeySet = new HashSet<>();
-    private static final String ETCD_ROOT_PATH = "/rpc/"; // 根节点
+    // 使用注册中心的缓存服务
+    private final RegistryServiceCache registryServiceCache = new RegistryServiceCache();
+    // 正在监听的key集合
+    private final Set<String> watchingKeySet = new ConcurrentHashSet<>();
+    // 根节点
+    private static final String ETCD_ROOT_PATH = "/rpc/";
 
     /**
      * etcd注册中心初始化
@@ -134,7 +143,16 @@ public class EtcdRegistry implements Registry{
      */
     @Override
     public List<ServiceMetaInfo> serviceDiscovery(String serviceKey) {
+        // 优先从注册中心的本地缓存中获取服务
+        List<ServiceMetaInfo> serviceMetaInfoList = registryServiceCache.readCache();
+        if(serviceMetaInfoList != null) {
+            log.info("从注册中心的本地缓存中获取到了服务");
+            return serviceMetaInfoList;
+        }
+
+        // 本地缓存没有，再去注册中心拉取
         // 构建前缀搜索，结尾一定要加"/"
+        log.info("从注册中心中获取服务");
         String searchPrefix = ETCD_ROOT_PATH + serviceKey + "/";
         try {
             // 前缀查询
@@ -147,10 +165,17 @@ public class EtcdRegistry implements Registry{
             // 解析服务信息
             List<ServiceMetaInfo> serviceMetaInfos = keyValues.stream()
                     .map(keyValue -> {
+                        String key = keyValue.getKey().toString(StandardCharsets.UTF_8);
+                        // 监听key的变化
+                        watch(key);
                         String value = keyValue.getValue().toString(StandardCharsets.UTF_8);
                         return JSONUtil.toBean(value, ServiceMetaInfo.class);
                     })
                     .collect(Collectors.toList());
+
+            // 写入到注册中心的服务本地缓存
+            registryServiceCache.writeCache(serviceMetaInfos);
+
             return serviceMetaInfos;
         } catch (Exception e) {
             throw new RuntimeException("获取服务列表失败", e);
@@ -191,6 +216,32 @@ public class EtcdRegistry implements Registry{
         // 支持秒级别定时任务
         CronUtil.setMatchSecond(true);
         CronUtil.start();
+    }
+
+    /**
+     * 监听（消费端，何时更新服务缓存
+     * @param serviceNodeKey
+     */
+    @Override
+    public void watch(String serviceNodeKey) {
+        Watch watchClient = client.getWatchClient();
+        // 之前未被监听，现在开启监听
+        boolean newWatch = watchingKeySet.add(serviceNodeKey);
+        if(newWatch) {
+            watchClient.watch(ByteSequence.from(serviceNodeKey, StandardCharsets.UTF_8), response -> {
+                for(WatchEvent event : response.getEvents()) {
+                    switch (event.getEventType()) {
+                        // key删除时触发更新，清理缓存
+                        case DELETE:
+                            registryServiceCache.clearCache();
+                            break;
+                        case PUT:
+                        default:
+                            break;
+                    }
+                }
+            });
+        }
     }
 
     /**

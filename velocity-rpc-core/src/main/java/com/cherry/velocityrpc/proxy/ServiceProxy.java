@@ -12,7 +12,6 @@ import com.cherry.velocityrpc.model.ServiceMetaInfo;
 import com.cherry.velocityrpc.registry.Registry;
 import com.cherry.velocityrpc.registry.RegistryFactory;
 import com.cherry.velocityrpc.serializer.Serializer;
-import com.cherry.velocityrpc.serializer.JdkSerializer;
 import com.cherry.velocityrpc.serializer.SerializerFactory;
 
 import java.io.IOException;
@@ -39,7 +38,7 @@ public class ServiceProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         // 指定序列化器
-        final Serializer serializer = SerializerFactory.getInstance(RpcApplication.getRpcConfig().getSerializer());
+         final Serializer serializer = SerializerFactory.getInstance(RpcApplication.getRpcConfig().getSerializer());
 
         String serviceName = method.getDeclaringClass().getName();
 
