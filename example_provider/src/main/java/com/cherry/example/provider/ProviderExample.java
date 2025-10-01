@@ -10,6 +10,7 @@ import com.cherry.velocityrpc.registry.Registry;
 import com.cherry.velocityrpc.registry.RegistryFactory;
 import com.cherry.velocityrpc.server.HttpServer;
 import com.cherry.velocityrpc.server.VertxHttpServer;
+import com.cherry.velocityrpc.server.tcp.VertxTcpServer;
 
 /**
  * 测试全局配置对象加载，能够根据配置动态地在不同端口启动web服务
@@ -37,8 +38,12 @@ public class ProviderExample {
             throw new RuntimeException(e);
         }
 
-        // 启动web服务
-        HttpServer httpServer = new VertxHttpServer();
-        httpServer.doStart(RpcApplication.getRpcConfig().getServerPort());
+//        // 启动web服务
+//        HttpServer httpServer = new VertxHttpServer();
+//        httpServer.doStart(RpcApplication.getRpcConfig().getServerPort());
+
+        // 启动Tcp服务
+        VertxTcpServer vertxTcpServer = new VertxTcpServer();
+        vertxTcpServer.doStart(rpcConfig.getServerPort());
     }
 }

@@ -1,9 +1,11 @@
 package com.cherry.velocityrpc.protocol;
 
+import cn.hutool.core.util.ObjectUtil;
 import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -51,8 +53,11 @@ public enum ProtocolMessageSerializerEnum {
      * @return
      */
     public static ProtocolMessageSerializerEnum getEnumByValue(String value) {
+        if (ObjectUtil.isEmpty(value)) {
+            return null;
+        }
         for(ProtocolMessageSerializerEnum anEnum : ProtocolMessageSerializerEnum.values()) {
-            if(anEnum.value == value)
+            if(anEnum.value.equals(value))
                 return anEnum;
         }
         return null;
