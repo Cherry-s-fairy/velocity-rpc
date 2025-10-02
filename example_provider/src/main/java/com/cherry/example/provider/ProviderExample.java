@@ -10,6 +10,7 @@ import com.cherry.velocityrpc.registry.Registry;
 import com.cherry.velocityrpc.registry.RegistryFactory;
 import com.cherry.velocityrpc.server.HttpServer;
 import com.cherry.velocityrpc.server.VertxHttpServer;
+import com.cherry.velocityrpc.server.tcp.TcpServerHandler;
 import com.cherry.velocityrpc.server.tcp.VertxTcpServer;
 
 /**

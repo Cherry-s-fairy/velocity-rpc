@@ -145,7 +145,7 @@ public class EtcdRegistry implements Registry{
     public List<ServiceMetaInfo> serviceDiscovery(String serviceKey) {
         // 优先从注册中心的本地缓存中获取服务
         List<ServiceMetaInfo> serviceMetaInfoList = registryServiceCache.readCache();
-        if(serviceMetaInfoList != null) {
+        if(serviceMetaInfoList != null && serviceMetaInfoList.size() != 0) {
             log.info("从注册中心的本地缓存中获取到了服务");
             return serviceMetaInfoList;
         }

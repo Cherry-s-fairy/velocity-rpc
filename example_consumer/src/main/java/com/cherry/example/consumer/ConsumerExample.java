@@ -2,9 +2,9 @@ package com.cherry.example.consumer;
 
 import com.cherry.example.common.model.User;
 import com.cherry.example.common.service.UserService;
-//import com.cherry.velocityrpc.config.RpcConfig;
+import com.cherry.velocityrpc.config.RpcConfig;
 import com.cherry.velocityrpc.proxy.ServiceProxyFactory;
-//import com.cherry.velocityrpc.utils.ConfigUtils;
+import com.cherry.velocityrpc.utils.ConfigUtils;
 
 /**
  * 测试配置文件读取（application.properties）
