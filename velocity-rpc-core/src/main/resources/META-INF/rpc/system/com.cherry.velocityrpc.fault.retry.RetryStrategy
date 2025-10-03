@@ -1,0 +1,2 @@
+no=com.cherry.velocityrpc.fault.retry.NoRetryStrategy
+fixedInterval=com.cherry.velocityrpc.fault.retry.FixedIntervalRetryStrategy

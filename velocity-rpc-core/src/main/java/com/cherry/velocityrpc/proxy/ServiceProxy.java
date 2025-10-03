@@ -7,6 +7,8 @@ import cn.hutool.http.HttpResponse;
 import com.cherry.velocityrpc.RpcApplication;
 import com.cherry.velocityrpc.config.RpcConfig;
 import com.cherry.velocityrpc.constant.RpcConstant;
+import com.cherry.velocityrpc.fault.retry.RetryStrategy;
+import com.cherry.velocityrpc.fault.retry.RetryStrategyFactory;
 import com.cherry.velocityrpc.loadbalancer.LoadBalancer;
 import com.cherry.velocityrpc.loadbalancer.LoadBalancerFactory;
 import com.cherry.velocityrpc.model.RpcRequest;
@@ -113,8 +115,13 @@ public class ServiceProxy implements InvocationHandler {
         requestParams.put("methodName", rpcRequest.getMethodName());
         ServiceMetaInfo selectedServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfos);
 
-        // 解决粘包和半包
-        RpcResponse response = VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo);
+        // 使用重试机制
+        RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
+        RpcResponse response = retryStrategy.doRetry(() ->
+            // 解决粘包和半包
+            VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo)
+        );
+//        RpcResponse response = VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo);
         System.out.println(serviceMetaInfos.get(0).toString());
         return response.getData();
 //        // 发送tcp（rpc）请求

@@ -1,5 +1,6 @@
 package com.cherry.velocityrpc.config;
 
+import com.cherry.velocityrpc.fault.retry.RetryStrategyKeys;
 import com.cherry.velocityrpc.loadbalancer.LoadBalancerKeys;
 import com.cherry.velocityrpc.serializer.SerializerKeys;
 import lombok.Data;
@@ -21,4 +22,6 @@ public class RpcConfig {
     private RegistryConfig registryConfig = new RegistryConfig(); // 注册中心配置
 
     private String loadBalancer = LoadBalancerKeys.ROUND_ROBIN; // 默认负载均衡器配置
+
+    private String retryStrategy = RetryStrategyKeys.NO; // 默认重试策略
 }
