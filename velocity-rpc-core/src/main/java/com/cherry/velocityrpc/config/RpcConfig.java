@@ -1,6 +1,8 @@
 package com.cherry.velocityrpc.config;
 
 import com.cherry.velocityrpc.fault.retry.RetryStrategyKeys;
+import com.cherry.velocityrpc.fault.tolerant.TolerantStrategy;
+import com.cherry.velocityrpc.fault.tolerant.TolerantStrategyKeys;
 import com.cherry.velocityrpc.loadbalancer.LoadBalancerKeys;
 import com.cherry.velocityrpc.serializer.SerializerKeys;
 import lombok.Data;
@@ -24,4 +26,6 @@ public class RpcConfig {
     private String loadBalancer = LoadBalancerKeys.ROUND_ROBIN; // 默认负载均衡器配置
 
     private String retryStrategy = RetryStrategyKeys.NO; // 默认重试策略
+
+    private String tolerantStrategy = TolerantStrategyKeys.FAIL_FAST; // 默认容错策略
 }

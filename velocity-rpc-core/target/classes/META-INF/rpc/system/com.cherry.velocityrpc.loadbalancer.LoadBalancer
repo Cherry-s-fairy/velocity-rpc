@@ -1,0 +1,3 @@
+roundRobin=com.cherry.velocityrpc.loadbalancer.RoundRobinLoadBalancer
+random=com.cherry.velocityrpc.loadbalancer.RandomLoadBalancer
+consistentHash=com.cherry.velocityrpc.loadbalancer.ConsistentHashLoadBalance

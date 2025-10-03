@@ -9,6 +9,8 @@ import com.cherry.velocityrpc.config.RpcConfig;
 import com.cherry.velocityrpc.constant.RpcConstant;
 import com.cherry.velocityrpc.fault.retry.RetryStrategy;
 import com.cherry.velocityrpc.fault.retry.RetryStrategyFactory;
+import com.cherry.velocityrpc.fault.tolerant.TolerantStrategy;
+import com.cherry.velocityrpc.fault.tolerant.TolerantStrategyFactory;
 import com.cherry.velocityrpc.loadbalancer.LoadBalancer;
 import com.cherry.velocityrpc.loadbalancer.LoadBalancerFactory;
 import com.cherry.velocityrpc.model.RpcRequest;
@@ -115,12 +117,23 @@ public class ServiceProxy implements InvocationHandler {
         requestParams.put("methodName", rpcRequest.getMethodName());
         ServiceMetaInfo selectedServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfos);
 
-        // 使用重试机制
-        RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
-        RpcResponse response = retryStrategy.doRetry(() ->
-            // 解决粘包和半包
-            VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo)
-        );
+        // 使用容错+重试机制
+        RpcResponse response;
+        try {
+            RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
+            response = retryStrategy.doRetry(() ->
+                    VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo));
+        } catch (Exception e) {
+            TolerantStrategy tolerantStrategy = TolerantStrategyFactory.getInstance(rpcConfig.getTolerantStrategy());
+            response = tolerantStrategy.doTolerant(null, e);
+        }
+//        // 使用重试机制
+//        RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
+//        RpcResponse response = retryStrategy.doRetry(() ->
+//            // 解决粘包和半包
+//            VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo)
+//        );
+//        // 解决粘包和半包
 //        RpcResponse response = VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo);
         System.out.println(serviceMetaInfos.get(0).toString());
         return response.getData();

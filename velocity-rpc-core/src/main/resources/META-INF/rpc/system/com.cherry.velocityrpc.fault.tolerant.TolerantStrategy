@@ -1,0 +1,4 @@
+failFast=com.cherry.velocityrpc.fault.tolerant.FailFastTolerantStrategy
+failSafe=com.cherry.velocityrpc.fault.tolerant.FailSafeTolerantStrategy
+failOver=com.cherry.velocityrpc.fault.tolerant.FailOverTolerantStrategy
+failBack=com.cherry.velocityrpc.fault.tolerant.FailBackTolerantStrategy
