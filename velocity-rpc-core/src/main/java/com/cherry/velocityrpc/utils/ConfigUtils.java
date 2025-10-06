@@ -20,8 +20,8 @@ public class ConfigUtils {
 
     /**
      * 加载配置对象，支持区分环境
-     * @param tClass
-     * @param prefix
+     * @param tClass 目标配置类的class对象
+     * @param prefix 配置文件中的前缀
      * @param environment 环境标识，例如"dev", "test"(测试环境, "prod"(生产环境等。
      * @return
      * @param <T>
